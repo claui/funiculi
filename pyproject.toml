@@ -1,0 +1,71 @@
+[build-system]
+requires = ["poetry-core>=1.9.0"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.mypy]
+check_untyped_defs = true
+disallow_any_generics = true
+disallow_incomplete_defs = true
+disallow_subclassing_any = true
+disallow_untyped_calls = true
+disallow_untyped_decorators = true
+disallow_untyped_defs = true
+files = "funiculi/**/*.py,tests/**/*.py"
+implicit_reexport = false
+no_implicit_optional = true
+strict_equality = true
+warn_redundant_casts = true
+warn_return_any = true
+warn_unused_ignores = true
+
+[tool.poetry]
+name = "funiculi"
+version = "0.1.0"
+description = "Control your Denon AVR amplifier from the command line"
+readme = "README.md"
+authors = [
+    "Claudia Pellegrino <clau@tiqua.de>",
+]
+license = "Apache-2.0"
+
+[tool.poetry.dependencies]
+python = "~3.8"
+colorama = "*"
+dataclass-wizard = "~=0.22"
+fire = "*"
+
+[tool.poetry.group.dev.dependencies]
+autopep8 = "*"
+mypy = "~=1.8"
+pdoc = "~=14.0"
+poethepoet = "~=0.24"
+pylint = "~=3.0"
+pytest = "*"
+types-colorama = "*"
+
+[tool.poetry.scripts]
+funiculi = "funiculi.cli:run"
+
+[tool.poe]
+verbosity = -1
+
+[tool.poe.tasks]
+tasks.cmd = "poe -v"
+tasks.help = "List available tasks"
+cli.script = "funiculi.cli:run"
+cli.help = "Run command line interface"
+doc.cmd = "pdoc funiculi !funiculi.settings"
+doc.help = "Browse documentation"
+linter.cmd = "pylint --enable-all-extensions funiculi"
+linter.help = "Check for style violations"
+tests.cmd = "pytest"
+tests.help = "Run test suite"
+typecheck.cmd = "mypy"
+typecheck.help = "Run static type checker"
+
+[tool.pyright]
+reportUnsupportedDunderAll = "none"
+
+[tool.pytest.ini_options]
+testpaths = "tests"
+xfail_strict = true

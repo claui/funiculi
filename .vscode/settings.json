@@ -1,0 +1,52 @@
+{
+  "[json]": {
+    "editor.defaultFormatter": "vscode.json-language-features"
+  },
+  "[jsonc]": {
+    "editor.defaultFormatter": "vscode.json-language-features"
+  },
+  "[python]": {
+    "editor.defaultFormatter": "ms-python.black-formatter"
+  },
+  "[toml]": {
+    "editor.defaultFormatter": "tamasfe.even-better-toml"
+  },
+  "code-runner.clearPreviousOutput": true,
+  "code-runner.executorMap": {
+    "python": "poetry run python",
+  },
+  "code-runner.ignoreSelection": true,
+  "code-runner.saveFileBeforeRun": true,
+  "editor.rulers": [
+    68,
+    72
+  ],
+  "files.exclude": {
+    "**/.git": true,
+    "**/.mypy_cache": true,
+    "**/.pytest_cache": true,
+    "**/.shims": true,
+    "**/.venv": true,
+    "**/*.egg-info": true,
+    "**/__pycache__": true
+  },
+  "pylint.args": [
+    "--enable-all-extensions"
+  ],
+  "pylint.path": [
+    "${workspaceFolder}/.venv/bin/pylint"
+  ],
+  "pylint.severity": {
+    "refactor": "Warning"
+  },
+  "python.analysis.autoImportCompletions": true,
+  "python.analysis.typeCheckingMode": "basic",
+  "python.defaultInterpreterPath": "${workspaceFolder}/.venv/bin/python",
+  "python.testing.pytestArgs": [
+    "tests"
+  ],
+  "python.testing.pytestEnabled": true,
+  "workbench.editor.decorations.badges": false,
+  "workbench.editor.decorations.colors": false,
+  "workbench.editor.untitled.hint": "hidden"
+}
