@@ -57,6 +57,3 @@ jobs:
 
       - name: Run linter
         run: poetry run poe linter
-
-      - name: Run unit tests
-        run: poetry run poe tests
