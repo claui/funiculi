@@ -29,17 +29,17 @@ authors = [
 license = "Apache-2.0"
 
 [tool.poetry.dependencies]
-python = "^3.8"
+python = ">=3.8"
 colorama = "*"
-dataclass-wizard = "~=0.22"
+dataclass-wizard = ">=0.22"
 fire = "*"
 
 [tool.poetry.group.dev.dependencies]
 autopep8 = "*"
-mypy = "~=1.8"
-pdoc = "~=14.0"
-poethepoet = "~=0.24"
-pylint = "~=3.0"
+mypy = ">=1.8"
+pdoc = ">=14.0"
+poethepoet = ">=0.24"
+pylint = ">=3.0"
 pytest = "*"
 types-colorama = "*"
 
