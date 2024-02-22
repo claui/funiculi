@@ -57,3 +57,6 @@ jobs:
 
       - name: Run linter
         run: poetry run poe linter
+
+      - name: Run man page generator
+        run: poetry run poe doc
