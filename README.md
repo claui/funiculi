@@ -28,29 +28,6 @@ Direct your favorite
 funiculi [FLAGS] COMMAND
 ```
 
-The following flags are supported:
-
-- `-h`, `--host=HOST`  
-  The AVR host to connect to.  
-  Mandatory if no `AVR_HOST` environment variable is defined.  
-  The parameter takes precedence over the environment variable.
-
-- `-c`, `--ctrlport=CTRLPORT`  
-  Default: 23  
-  The AVR control port to connect to.
-
-- `-w`, `--webport=WEBPORT`  
-  Default: 60006  
-  The AVR web port from which to obtain DLNA metadata.
-
-- `-t, --timeout=TIMEOUT`  
-  Default: 100  
-  The timeout for commands in milliseconds.
-
-- `-p`, `--path=PATH`  
-  Default: `/upnp/desc/aios_device/aios_device.xml`  
-  The remote path to the UPnP XML descriptor.
-
 `COMMAND` is one of the following:
 
 - `off`  
@@ -71,6 +48,8 @@ The following flags are supported:
 - `dlna`  
   Sets up a local virtual output device that relays all audio to the
   receiver via DLNA.
+
+See [`USAGE.md`](https://github.com/claui/funiculi/blob/main/USAGE.md) or `man 1 funiculi` for details.
 
 ## Contributing to Funiculi
 
