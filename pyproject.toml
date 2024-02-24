@@ -30,6 +30,13 @@ authors = [
     "Claudia Pellegrino <clau@tiqua.de>",
 ]
 license = "Apache-2.0"
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Operating System :: MacOS",
+    "Operating System :: POSIX",
+    "Topic :: Home Automation",
+    "Topic :: Utilities",
+]
 
 [tool.poetry.dependencies]
 python = ">=3.8"
