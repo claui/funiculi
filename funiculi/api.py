@@ -106,7 +106,7 @@ class Api:
                     '-C', '-o', f.name, '--no-shutdown', self._avr_host,
                     str(self._avr_ctrl_port),
                 ],
-                capture_output=True, check=False, encoding='ascii',
+                capture_output=True, check=False, encoding='utf-8',
                 input=payload, text=True)
         except OSError as e:
             raise CliError(f'{e.strerror} ({e.filename})') from e
