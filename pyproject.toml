@@ -34,7 +34,6 @@ license = "Apache-2.0"
 [tool.poetry.dependencies]
 python = ">=3.8"
 colorama = "*"
-dataclass-wizard = ">=0.22"
 fire = "*"
 
 [tool.poetry.group.dev.dependencies]
