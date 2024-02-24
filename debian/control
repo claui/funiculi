@@ -1,0 +1,21 @@
+Source: funiculi
+Section: net
+Priority: optional
+Maintainer: Claudia Pellegrino <deb@cpellegrino.de>
+Build-Depends: debhelper-compat (= 13), dh-python, pybuild-plugin-pyproject, python3-all, python3-myst-parser, python3-poetry-core, python3-sphinx
+Standards-Version: 4.5.1
+Homepage: https://www.github.com/claui/funiculi
+Vcs-Browser: https://www.github.com/claui/funiculi
+Vcs-Git: https://www.github.com/claui/funiculi.git
+#Testsuite: autopkgtest-pkg-python
+Rules-Requires-Root: no
+
+Package: funiculi
+Architecture: all
+Depends: ${python3:Depends}, ${misc:Depends}, ncat, pulseaudio-dlna, python3-colorama, python3-fire
+Description: Control Denon amplifiers from the command line (Python 3)
+ CLI tool to interact with Denon AVR amplifiers over the local network.
+ Turn the unit on and off, change volume, and stream music to it over
+ DLNA.
+ .
+ This package installs the utility and documentation for Python 3.

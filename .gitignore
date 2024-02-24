@@ -1,6 +1,14 @@
 /build/
+/debian/.debhelper/generated/
+/debian/debhelper-build-stamp
+/debian/files
+/debian/funiculi/
+/debian/funiculi.*.debhelper
+/debian/funiculi.substvars
 /dist/
 /.venv/
 *.egg-info
+*.log
+.pybuild
 .pytest_cache
 __pycache__
