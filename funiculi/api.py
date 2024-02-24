@@ -1,16 +1,28 @@
 """The primary module in funiculi."""
 
+import logging
 import os
 import socket
 import subprocess
 import tempfile
-from typing import Optional
+from typing import Optional, Sequence, TYPE_CHECKING
 
 from .errors import CliError
+from .logging import get_logger
 
 from .settings import \
     DEFAULT_AVR_CTRL_PORT, DEFAULT_AVR_WEB_PORT, \
     DEFAULT_CTRL_TIMEOUT_MS, DEFAULT_UPNP_DESCRIPTOR_REMOTE_PATH
+
+
+logger = get_logger(__name__)
+
+
+# https://github.com/python/mypy/issues/5264#issuecomment-399407428
+if TYPE_CHECKING:  # pylint: disable=consider-ternary-expression
+    CompletedProcess = subprocess.CompletedProcess[str]
+else:
+    CompletedProcess = subprocess.CompletedProcess
 
 
 class Api:
@@ -99,15 +111,36 @@ class Api:
             mode='w', encoding='ascii', suffix='.funiculi.status',
             delete=False)
         f.close()
-        process = subprocess.run(
-            [
-                'timeout', str(self._timeout_ms / 1000), 'ncat',
-                '-C', '-o', f.name, '--no-shutdown', self._avr_host,
-                str(self._avr_ctrl_port),
-            ],
-            capture_output=True, check=False, encoding='ascii',
-            input=payload, text=True)
+        try:
+            result = subprocess.run(
+                [
+                    'timeout', str(self._timeout_ms / 1000), 'ncat',
+                    '-C', '-o', f.name, '--no-shutdown', self._avr_host,
+                    str(self._avr_ctrl_port),
+                ],
+                capture_output=True, check=False, encoding='utf-8',
+                input=payload, text=True)
+        except OSError as e:
+            raise CliError(f'{e.strerror} ({e.filename})') from e
         os.remove(f.name)
-        if process.returncode not in (0, 124):
+        if result.stderr:
+            _process_log(result, acceptable_exit_codes=(0, 124))
+            _process_check(result, acceptable_exit_codes=(0, 124))
+        return os.linesep.join(result.stdout.splitlines())
+
+def _process_check(
+    process: CompletedProcess, acceptable_exit_codes: Sequence[int]=(0,),
+) -> None:
+    if process.returncode not in acceptable_exit_codes:
+        try:
             process.check_returncode()
-        return os.linesep.join(process.stdout.splitlines())
+        except subprocess.CalledProcessError as e:
+            raise CliError(e) from e
+
+def _process_log(
+    process: CompletedProcess, acceptable_exit_codes: Sequence[int]=(0,),
+) -> None:
+    log_level = logging.WARNING \
+        if process.returncode in acceptable_exit_codes \
+        else logging.ERROR
+    logger.log(log_level, os.linesep.join(process.stderr.splitlines()))
