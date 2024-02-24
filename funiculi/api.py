@@ -99,14 +99,17 @@ class Api:
             mode='w', encoding='ascii', suffix='.funiculi.status',
             delete=False)
         f.close()
-        process = subprocess.run(
-            [
-                'timeout', str(self._timeout_ms / 1000), 'ncat',
-                '-C', '-o', f.name, '--no-shutdown', self._avr_host,
-                str(self._avr_ctrl_port),
-            ],
-            capture_output=True, check=False, encoding='ascii',
-            input=payload, text=True)
+        try:
+            result = subprocess.run(
+                [
+                    'timeout', str(self._timeout_ms / 1000), 'ncat',
+                    '-C', '-o', f.name, '--no-shutdown', self._avr_host,
+                    str(self._avr_ctrl_port),
+                ],
+                capture_output=True, check=False, encoding='ascii',
+                input=payload, text=True)
+        except OSError as e:
+            raise CliError(f'{e.strerror} ({e.filename})') from e
         os.remove(f.name)
         if process.returncode not in (0, 124):
             process.check_returncode()
