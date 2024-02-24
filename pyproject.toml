@@ -20,7 +20,7 @@ warn_unused_ignores = true
 
 [tool.poetry]
 name = "funiculi"
-version = "0.1.4"
+version = "0.1.5a1"
 description = "Control your Denon AVR amplifier from the command line"
 readme = [
     "README.md",
