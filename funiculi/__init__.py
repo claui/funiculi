@@ -8,6 +8,9 @@
 # (This promotes them from funiculi.api to funiculi)
 from funiculi.api import Api as Api
 
+from funiculi.version import version
+
+
 __all__ = [
     # Tell pdoc to pick up all re-exported symbols
     'Api',
@@ -17,3 +20,5 @@ __all__ = [
     'api',
     'settings',
 ]
+
+__version__ = version()
