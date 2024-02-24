@@ -1,5 +1,20 @@
 # Funiculi
 
+Funiculi is a tiny command-line utility which lets you interact with
+Denon AVR amplifiers over your local network.
+
+It currently supports turning the unit on and off, querying its
+power status, changing its volume, and streaming music to it over
+[DLNA](https://en.wikipedia.org/wiki/DLNA).
+
+## Prerequisites
+
+You need the following software installed on your system:
+
+- [`ncat`](https://github.com/nmap/nmap/tree/master/ncat#readme)
+
+- [`pulseaudio-dlna`](https://github.com/Cygn/pulseaudio-dlna)
+
 ## Installation
 
 ### Installing from PyPI
