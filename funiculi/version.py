@@ -4,7 +4,7 @@ from contextlib import suppress
 import importlib.metadata
 from typing import Union
 
-from .settings import PROJECT_ROOT
+from .settings import PYPROJECT_TOML
 
 
 def version() -> Union[str, None]:
@@ -16,21 +16,17 @@ def version() -> Union[str, None]:
 
     :return:
         a version string if one is found, None otherwise.
-
-        The version string may be trailed by an explanation such as
-        ` (in development at path/to/project)` if the package is
-        invoked from a development tree.
     """
     with suppress(FileNotFoundError, StopIteration):
-        with open(
-            PROJECT_ROOT / 'pyproject.toml', encoding='utf-8',
-        ) as pyproject_toml:
+        with open(PYPROJECT_TOML, encoding='utf-8') as pyproject_toml:
             # Parse manually due to Debian 11 missing a `tomli` package
             version_lines = (
                 line for line in pyproject_toml
                 if line.startswith('version '))
-            return next(version_lines).split('=')[1].strip("'\"\n ") \
-                + f' (in development at {PROJECT_ROOT})'
+            return next(version_lines).split('=')[1].strip("'\"\n ")
+
+    with suppress(FileNotFoundError):
         return importlib.metadata.version(
             __package__ or __name__.split('.', maxsplit=1)[0])
+
     return None
