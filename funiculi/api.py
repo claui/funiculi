@@ -97,14 +97,17 @@ class Api:
             avr_host_ipv4_addr = socket.gethostbyname(self._avr_host)
         except OSError as e:
             raise CliError(f'{e.strerror} ({self._avr_host})') from e
-        subprocess.run(
-            [
-                'pulseaudio-dlna',
-                '--renderer-urls',
-                f'http://{avr_host_ipv4_addr}:{self._avr_web_port}' \
-                    + self._upnp_descriptor_path
-            ],
-            check=True)
+        try:
+            subprocess.run(
+                [
+                    'pulseaudio-dlna',
+                    '--renderer-urls',
+                    f'http://{avr_host_ipv4_addr}:{self._avr_web_port}' \
+                        + self._upnp_descriptor_path
+                ],
+                check=True)
+        except subprocess.CalledProcessError as e:
+            raise CliError(e) from e
 
     def _send(self, payload: str) -> str:
         f = tempfile.NamedTemporaryFile(  # pylint: disable=consider-using-with
