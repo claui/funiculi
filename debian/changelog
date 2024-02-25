@@ -1,6 +1,7 @@
 funiculi (0.1.4~bpo11+1) UNRELEASED; urgency=medium
 
   * Work around missing Poetry package on Bullseye
+  * Work around missing `myst-parser` on Bullseye
 
  -- Claudia Pellegrino <deb@cpellegrino.de>  Sun, 25 Feb 2024 21:31:23 +0000
 
