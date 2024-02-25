@@ -1,0 +1,55 @@
+From 5631c87dacd9ea05c175bb45e6995ac54c0acd82 Mon Sep 17 00:00:00 2001
+From: Claudia <claui@users.noreply.github.com>
+Date: Sun, 25 Feb 2024 12:33:15 +0100
+Subject: [PATCH] Work around missing `myst-parser` on Bullseye
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Bullseye (and by extension, Byzantium) doesn’t provide the
+`python3-myst-parser` package.
+As a workaround, invoke `pandoc` directly in `override_dh_auto_build`.
+
+Also remove the doc generating step from the GitHub workflow.
+It’s not strictly needed on Debian packaging branches. It also
+wouldn’t work anyway without installing Pandoc and generating the
+.rst file first.
+---
+--- a/.github/workflows/ci.yml
++++ b/.github/workflows/ci.yml
+@@ -57,6 +57,3 @@
+ 
+       - name: Run linter
+         run: poetry run poe linter
+-
+-      - name: Run man page generator
+-        run: poetry run poe doc
+--- a/.gitignore
++++ b/.gitignore
+@@ -5,6 +5,7 @@
+ /debian/funiculi/
+ /debian/funiculi.*.debhelper
+ /debian/funiculi.substvars
++/debian/*.rst
+ /dist/
+ /.pc/
+ /.venv/
+--- a/doc/sphinx/conf.py
++++ b/doc/sphinx/conf.py
+@@ -14,7 +14,6 @@
+ # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
+ 
+ extensions = [
+-    'myst_parser',
+     'sphinx.ext.autodoc',
+     'sphinx.ext.napoleon',
+ ]
+--- a/doc/sphinx/index.rst
++++ b/doc/sphinx/index.rst
+@@ -10,5 +10,4 @@
+    :maxdepth: 2
+    :caption: Contents:
+ 
+-.. include:: ../../USAGE.md
+-   :parser: myst_parser.sphinx_
++.. include:: ../../debian/USAGE.rst
