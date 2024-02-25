@@ -1,0 +1,125 @@
+From 44f3e1d60c27c2a7861c3950d961e8476de6f8ee Mon Sep 17 00:00:00 2001
+From: Claudia <claui@users.noreply.github.com>
+Date: Sun, 25 Feb 2024 12:24:33 +0100
+Subject: [PATCH] Work around missing Poetry package on Bullseye
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Bullseye (and by extension, Byzantium) doesn’t carry the
+`python3-poetry-core` package.
+
+Migrate the build process to Flit v3.0.0, which is supported natively
+in Bullseye’s version of pybuild.
+
+Additional workarounds required for Flit v3.0.0:
+
+- Use old-style metadata (`tool.flit.metadata` section in
+  `pyproject.toml`)
+
+- Restructure the `tool.poe.tasks` section in `pyproject.toml`, because
+  Flit would error out when using nested keys outside of section
+  headings, e.g. `tasks.cmd = "poe -v"`.
+---
+--- a/pyproject.toml
++++ b/pyproject.toml
+@@ -1,6 +1,48 @@
++# Use Flit instead of Poetry as long as we need to support Debian 11,
++# which doesn’t provide Poetry.
++#
++# On top of that, Debian 11 only ships flit v3.0.0, which means we have
++# to use old-style metadata, too (`tool.flit.metadata` instead of
++# `project`, and `flit_core >=2` instead of `flit_core >=3.2`.)
++
+ [build-system]
+-requires = ["poetry-core>=1.9.0"]
+-build-backend = "poetry.core.masonry.api"
++requires = ["flit_core >=2,<4"]
++build-backend = "flit_core.buildapi"
++
++[tool.flit.metadata]
++module = "funiculi"
++author = "Claudia Pellegrino"
++author-email = "clau@tiqua.de"
++description-file = "README.md"
++requires-python = ">=3.8"
++requires = [
++    "colorama >=0.4.4",
++    "fire >=0.4.0",
++]
++classifiers = [
++    "Development Status :: 3 - Alpha",
++    "License :: OSI Approved :: Apache Software License",
++    "Operating System :: MacOS",
++    "Operating System :: POSIX :: Linux",
++    "Topic :: Home Automation",
++    "Topic :: Utilities",
++]
++
++[tool.flit.metadata.requires-extra]
++dev = [
++    "autopep8 >=2.0.0",
++    "mypy >=1.8",
++    "myst-parser >=2.0.0",
++    "pdoc >=14.0",
++    "poethepoet >=0.24",
++    "pylint >=3.0",
++    "pytest >=6.0.2",
++    "sphinx >=7.1.2, <7.2.0",
++    "types-colorama >=0.4.4"
++]
++
++[tool.flit.scripts]
++funiculi = "funiculi.cli:run"
+ 
+ [tool.mypy]
+ check_untyped_defs = true
+@@ -60,21 +102,33 @@
+ [tool.poe]
+ verbosity = -1
+ 
+-[tool.poe.tasks]
+-tasks.cmd = "poe -v"
+-tasks.help = "List available tasks"
+-cli.script = "funiculi.cli:run"
+-cli.help = "Run command line interface"
+-doc.cmd = "sphinx-build -aqEW -b man doc/sphinx build/man"
+-doc.help = "Generate documentation"
+-linter.cmd = "pylint --enable-all-extensions funiculi"
+-linter.help = "Check for style violations"
+-man.cmd = "man build/man/funiculi.1"
+-man.help = "Open manual page"
+-tests.cmd = "pytest"
+-tests.help = "Run test suite"
+-typecheck.cmd = "mypy"
+-typecheck.help = "Run static type checker"
++[tool.poe.tasks.tasks]
++cmd = "poe -v"
++help = "List available tasks"
++
++[tool.poe.tasks.cli]
++script = "funiculi.cli:run"
++help = "Run command line interface"
++
++[tool.poe.tasks.doc]
++cmd = "sphinx-build -aqEW -b man doc/sphinx build/man"
++help = "Generate documentation"
++
++[tool.poe.tasks.linter]
++cmd = "pylint --enable-all-extensions funiculi"
++help = "Check for style violations"
++
++[tool.poe.tasks.man]
++cmd = "man build/man/funiculi.1"
++help = "Open manual page"
++
++[tool.poe.tasks.tests]
++cmd = "pytest"
++help = "Run test suite"
++
++[tool.poe.tasks.typecheck]
++cmd = "mypy"
++help = "Run static type checker"
+ 
+ [tool.pyright]
+ reportUnsupportedDunderAll = "none"

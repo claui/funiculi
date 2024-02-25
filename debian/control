@@ -2,7 +2,7 @@ Source: funiculi
 Section: net
 Priority: optional
 Maintainer: Claudia Pellegrino <deb@cpellegrino.de>
-Build-Depends: debhelper-compat (= 13), dh-python, pybuild-plugin-pyproject, python3-all, python3-myst-parser, python3-poetry-core, python3-sphinx
+Build-Depends: debhelper-compat (= 13), dh-python, flit, python3-all, python3-colorama, python3-myst-parser, python3-sphinx
 Standards-Version: 4.5.1
 Homepage: https://www.github.com/claui/funiculi
 Vcs-Browser: https://www.github.com/claui/funiculi
