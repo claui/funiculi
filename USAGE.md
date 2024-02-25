@@ -10,24 +10,24 @@ funiculi [FLAGS] COMMAND
 
 `COMMAND` is one of the following:
 
-- `off`  
-  Turns the device off.
+`off`
+: Turns the device off.
 
-- `on`  
-  Turns the device on.
+`on`
+: Turns the device on.
 
-- `down`  
-  Turns the volume down one step.
+`down`
+: Turns the volume down one step.
 
-- `up`  
-  Turns the volume up one step.
+`up`
+: Turns the volume up one step.
 
-- `status`  
-  Queries whether the device is on standby.
+`status`
+: Queries whether the device is on standby.
 
-- `dlna`  
-  Sets up a local virtual output device that relays all audio to the
-  receiver via DLNA.
+`dlna`
+: Sets up a local virtual output device that relays all audio to the
+: receiver via DLNA.
 
 # Flags
 
