@@ -6,6 +6,7 @@
 /debian/funiculi.*.debhelper
 /debian/funiculi.substvars
 /dist/
+/.pc/
 /.venv/
 *.egg-info
 *.log
