@@ -19,6 +19,10 @@ extensions = [
     'sphinx.ext.napoleon',
 ]
 
+myst_enable_extensions = [
+    'deflist',
+]
+
 templates_path = []
 exclude_patterns = []
 
