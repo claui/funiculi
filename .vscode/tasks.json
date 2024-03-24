@@ -20,13 +20,14 @@
       }
     },
     {
-      "label": "Funiculi: Run hello",
+      "label": "Funiculi: Power on",
       "type": "shell",
       "command": "poetry",
       "args": [
         "run",
         "poe",
-        "hello"
+        "cli",
+        "on"
       ],
       "problemMatcher": [],
       "group": {
@@ -39,14 +40,14 @@
       }
     },
     {
-      "label": "Funiculi: Run hello 'Claudia Pellegrino'",
+      "label": "Funiculi: Power off",
       "type": "shell",
       "command": "poetry",
       "args": [
         "run",
         "poe",
-        "hello",
-        "Claudia Pellegrino"
+        "cli",
+        "off"
       ],
       "problemMatcher": [],
       "group": "build",
@@ -70,13 +71,13 @@
       }
     },
     {
-      "label": "Funiculi: Browse documentation",
+      "label": "Funiculi: Browse HTML documentation",
       "type": "process",
       "command": "poetry",
       "args": [
         "run",
         "poe",
-        "doc"
+        "html"
       ],
       "problemMatcher": [],
       "group": "build",

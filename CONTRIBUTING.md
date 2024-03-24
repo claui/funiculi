@@ -28,14 +28,14 @@ and follow one of the installation methods.
 #### Installing pyenv on Linux
 
 To install `pyenv` on Linux or WSL2, first make sure Python 3 is
-installed. Then follow the *Basic GitHub Checkout* method described
+installed. Then follow the _Basic GitHub Checkout_ method described
 at [github.com/pyenv/pyenv](https://github.com/pyenv/pyenv#basic-github-checkout).
 
 #### Installing pyenv on macOS
 
 To install `pyenv` on macOS, run:
 
-```
+```shell
 brew install pyenv
 ```
 
@@ -43,24 +43,24 @@ brew install pyenv
 
 To verify your `pyenv` is working, run:
 
-```
+```shell
 pyenv --version
 ```
 
 ### Checking your system-wide Python installation
 
-Make sure you have Python 3.7 or higher installed on your system
+Make sure you have Python 3.8 or higher installed on your system
 and available in your PATH.
 
 To check, run:
 
-```
+```shell
 python --version
 ```
 
 If that fails, try:
 
-```
+```shell
 python3 --version
 ```
 
@@ -76,7 +76,7 @@ described in Poetry’s documentation.
 
 To install Poetry on macOS, run:
 
-```
+```shell
 brew install poetry
 ```
 
@@ -91,7 +91,7 @@ described in Poetry’s documentation.
 
 To verify Poetry is working, run:
 
-```
+```shell
 poetry --version
 ```
 
@@ -103,9 +103,9 @@ To set up your virtual environment, follow these steps:
 
 2. Run `pyenv install -s`.
 
-3. Run `pyenv exec pip install poetry`.
+3. Run `pyenv exec python -m venv .venv`.
 
-4. Run `pyenv exec poetry install`.
+4. Run `poetry install`.
 
 You need to do the above steps only once.
 
@@ -115,27 +115,25 @@ To update your dependencies after a `git pull`, run `poetry update`.
 
 To see a list of available tasks, run: `poetry run poe tasks`
 
-## Running Funiculi
+### Running Funiculi
 
 To execute Funiculi, run:
 
-```
+```shell
 poetry run poe cli
 ```
-
-## Contributing to Funiculi
 
 ### Running the tests
 
 To execute the tests, run:
 
-```
+```shell
 poetry run poe tests
 ```
 
 To execute a single test, run e. g.:
 
-```
+```shell
 poetry run poe tests -vv tests/test_api.py::test_hello
 ```
 
@@ -143,7 +141,7 @@ poetry run poe tests -vv tests/test_api.py::test_hello
 
 To execute the linter, run:
 
-```
+```shell
 poetry run poe linter
 ```
 
@@ -151,7 +149,7 @@ poetry run poe linter
 
 To execute the static type check, run:
 
-```
+```shell
 poetry run poe typecheck
 ```
 
@@ -160,16 +158,22 @@ poetry run poe typecheck
 If you have [act](https://github.com/nektos/act) installed and a
 Docker daemon active, run:
 
-```sh
+```shell
 act
 ```
 
 ### Generating project documentation
 
-To generate project documentation and open it in your browser, run:
+To generate project documentation, run:
 
-```
+```shell
 poetry run poe doc
+```
+
+To open the generated documentation with `man`, run:
+
+```shell
+poetry run poe man
 ```
 
 ## Maintenance
@@ -178,7 +182,7 @@ poetry run poe doc
 
 If you get errors after a Git pull, refresh your dependencies:
 
-```
+```shell
 poetry update
 ```
 
@@ -187,22 +191,14 @@ poetry update
 If you’ve run `poetry update` and you still get errors, rebuild
 the virtual environment:
 
-```
+```shell
 poetry install
-```
-
-### Checking Funiculi’s dependencies for vulnerabilities
-
-To check Funiculi’s dependencies for known vulnerabilities, run:
-
-```
-poetry run poe check
 ```
 
 ### Checking Funiculi’s dependencies for compatible updates
 
 To check Funiculi’s dependencies for compatible updates, run:
 
-```
+```shell
 poetry update --dry-run
 ```

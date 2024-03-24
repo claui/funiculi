@@ -114,6 +114,7 @@ class Api:
             mode='w', encoding='ascii', suffix='.funiculi.status',
             delete=False)
         f.close()
+        logger.debug('Sending command: %s', payload)
         try:
             result = subprocess.run(
                 [
@@ -129,7 +130,9 @@ class Api:
         if result.stderr:
             _process_log(result, acceptable_exit_codes=(0, 124))
             _process_check(result, acceptable_exit_codes=(0, 124))
-        return os.linesep.join(result.stdout.splitlines())
+        response_str = os.linesep.join(result.stdout.splitlines())
+        logger.debug('Received response: %s', response_str)
+        return response_str
 
 def _process_check(
     process: CompletedProcess, acceptable_exit_codes: Sequence[int]=(0,),

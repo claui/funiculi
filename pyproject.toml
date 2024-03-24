@@ -22,13 +22,8 @@ warn_unused_ignores = true
 name = "funiculi"
 version = "0.1.4"
 description = "Control your Denon AVR amplifier from the command line"
-readme = [
-    "README.md",
-    "USAGE.md",
-]
-authors = [
-    "Claudia Pellegrino <clau@tiqua.de>",
-]
+readme = ["README.md", "USAGE.md"]
+authors = ["Claudia Pellegrino <clau@tiqua.de>"]
 license = "Apache-2.0"
 classifiers = [
     "Development Status :: 3 - Alpha",
@@ -67,6 +62,8 @@ cli.script = "funiculi.cli:run"
 cli.help = "Run command line interface"
 doc.cmd = "sphinx-build -aqEW -b man doc/sphinx build/man"
 doc.help = "Generate documentation"
+html.cmd = "pdoc funiculi !funiculi.settings"
+html.help = "Browse HTML documentation"
 linter.cmd = "pylint --enable-all-extensions funiculi"
 linter.help = "Check for style violations"
 man.cmd = "man build/man/funiculi.1"
@@ -82,3 +79,9 @@ reportUnsupportedDunderAll = "none"
 [tool.pytest.ini_options]
 testpaths = "tests"
 xfail_strict = true
+
+[tool.ruff]
+line-length = 72
+
+[tool.ruff.format]
+quote-style = "single"

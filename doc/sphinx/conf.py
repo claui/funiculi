@@ -7,6 +7,7 @@
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
 
 project = 'Funiculi'
+executable_name = 'funiculi'
 author = 'Claudia Pellegrino <clau@tiqua.de>'
 description = 'Control your Denon AVR amplifier from the command line'
 
@@ -30,7 +31,7 @@ exclude_patterns = []
 
 man_pages = [(
     'index',
-    project.lower(),
+    executable_name,
     description,
     [author],
     1,
