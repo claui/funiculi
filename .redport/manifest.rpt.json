@@ -2,13 +2,13 @@
   "upstream": {
     "type": "cookiecutter-template",
     "source": "https://github.com/claui/cookiecutter-python-package.git",
-    "commit": "ea50924f87234b9f2bcacb02f72d6df6e409cbc7",
+    "commit": "33a443677b933236daaf6bbd9f5523795c048f52",
     "replay": "cookiecutter_replay/cookiecutter-python-package.json",
     "patches": [
       "patches/dot-python-version.patch",
-      "patches/create-venv.ea50924.patch",
+      "patches/create-venv.patch",
       "patches/redirect-stdout.patch",
-      "patches/disable-install-step.ea50924.patch"
+      "patches/disable-install-step.patch"
     ],
     "nextPatches": [
       "patches/dot-python-version.patch",
