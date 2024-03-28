@@ -69,6 +69,7 @@ disable=raw-checker-failed,
         deprecated-pragma,
         use-symbolic-message-instead,
         docstring-first-line-empty,
+        consider-alternative-union-syntax,
         useless-import-alias
 
 # Enable the message, report, category or checker with the given id(s). You can
