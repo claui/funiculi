@@ -18,8 +18,8 @@
     "use_pandas": "n",
     "install_dependencies_now": "y",
     "_template": "python",
-    "_output_dir": "/home/claudia/Documents/dev",
-    "_repo_dir": "/home/claudia/.cookiecutters/cookiecutter-python-package",
+    "_output_dir": "REDACTED",
+    "_repo_dir": "REDACTED",
     "_checkout": null
   },
   "_cookiecutter": {
