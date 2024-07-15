@@ -22,6 +22,15 @@ funiculi [FLAGS] COMMAND
 `up`
 : Turns the volume up one step.
 
+`source [get | set NAME]`
+: Selects or queries the audio source.
+The `get` subcommand returns the current source.
+The `set` subcommand accepts a source name according to Denon’s
+protocol; the name is case-insensitive.
+Acceptable values vary by model. To find out the values for a
+specific model, omit this parameter while your device is set to a
+known source. Repeat for each source.
+
 `status`
 : Queries whether the device is on standby.
 

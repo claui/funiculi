@@ -5,7 +5,7 @@ import os
 import socket
 import subprocess
 import tempfile
-from typing import Optional, Sequence, TYPE_CHECKING
+from typing import Callable, Optional, Sequence, TYPE_CHECKING
 
 from .errors import CliError
 from .logging import get_logger
@@ -23,6 +23,29 @@ if TYPE_CHECKING:  # pylint: disable=consider-ternary-expression
     CompletedProcess = subprocess.CompletedProcess[str]
 else:
     CompletedProcess = subprocess.CompletedProcess
+
+
+class SourceApi:
+    """Selects or queries the audio source."""
+
+    def __init__(self, send: Callable[[str], str]) -> None:
+        self._send = send
+
+    def get(self) -> str:
+        """Queries the current audio source."""
+        return self._send('SI?')[2:]
+
+    def set(self, name: str) -> str:
+        """Selects an audio source.
+
+        :param name:
+            Source name according to Denon’s protocol.
+            This parameter is case-insensitive.
+            Acceptable values vary by model. To find out the values
+            for a specific model, omit this parameter while your
+            device is set to a known source. Repeat for each source.
+        """
+        return self._send(f'SI{name.upper()}')
 
 
 class Api:
@@ -46,6 +69,9 @@ class Api:
         The remote path to the UPnP XML descriptor.
     """
 
+    source: SourceApi
+    """Selects or queries the audio source."""
+
     def __init__(self,  # pylint: disable=too-many-arguments
         host: Optional[str]=None,
         ctrlport: int=DEFAULT_AVR_CTRL_PORT,
@@ -61,6 +87,7 @@ class Api:
         self._avr_web_port = webport
         self._timeout_ms = timeout
         self._upnp_descriptor_path = path
+        self.source = SourceApi(self._send)
 
 
     def off(self) -> None:
