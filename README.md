@@ -57,6 +57,9 @@ funiculi [FLAGS] COMMAND
 - `up`  
   Turns the volume up one step.
 
+- `source [get | set NAME]`  
+  Selects or queries the audio source.
+
 - `status`  
   Queries whether the device is on standby.
 
