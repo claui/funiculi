@@ -73,3 +73,12 @@ The default timeout is 100 ms.
 The remote path to the UPnP XML descriptor.
 
 The default value is: `/upnp/desc/aios_device/aios_device.xml`
+
+# Environment
+
+Funiculi supports the following environment variable:
+
+`FUNICULI_DEBUG`
+: If set to a non-zero value, causes Funiculi to enable debug-level
+: logging.
+: Also prints stack traces for errors where it normally would not.
