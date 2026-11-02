@@ -2,7 +2,7 @@
   "upstream": {
     "type": "cookiecutter-template",
     "source": "https://github.com/claui/cookiecutter-python-package.git",
-    "commit": "e4f11df96613eb01ad1b8587fdeae68204e0370f",
+    "commit": "c9d327c944284b4385b78d8dd8c1a1ec3290a107",
     "replay": "cookiecutter_replay/cookiecutter-python-package.json",
     "patches": [],
     "nextPatches": []
