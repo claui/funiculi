@@ -12,7 +12,7 @@
   },
   "code-runner.clearPreviousOutput": true,
   "code-runner.executorMap": {
-    "python": "poetry run python"
+    "python": "uv run python"
   },
   "code-runner.ignoreSelection": true,
   "code-runner.saveFileBeforeRun": true,
@@ -29,6 +29,11 @@
     "**/*.egg-info": true,
     "**/__pycache__": true
   },
+  // https://github.com/DavidAnson/vscode-markdownlint/issues/422
+  "json.schemaDownload.trustedDomains": {
+    "https://raw.githubusercontent.com/DavidAnson/markdownlint/": true,
+    "https://raw.githubusercontent.com/SchemaStore/schemastore/": true
+  },
   "pylint.args": [
     "--enable-all-extensions"
   ],
@@ -38,13 +43,11 @@
   "pylint.severity": {
     "refactor": "Warning"
   },
-  "python.analysis.autoImportCompletions": true,
-  "python.analysis.typeCheckingMode": "basic",
-  "python.defaultInterpreterPath": "${workspaceFolder}/.venv/bin/python",
   "python.testing.pytestArgs": [
     "tests"
   ],
   "python.testing.pytestEnabled": true,
+  "ruff.lint.enable": false,
   "workbench.editor.decorations.badges": false,
   "workbench.editor.decorations.colors": false,
   "workbench.editor.empty.hint": "hidden"

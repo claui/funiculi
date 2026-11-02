@@ -1,6 +1,8 @@
 {
   "cookiecutter": {
     "project_title": "Funiculi",
+    "pypi_package_name": "funiculi",
+    "python_package_name": "funiculi",
     "project_slug": "funiculi",
     "project_description": "Control your Denon AVR amplifier from the command line",
     "first_module_name": "api",
@@ -20,25 +22,29 @@
     "_template": "python",
     "_output_dir": "REDACTED",
     "_repo_dir": "REDACTED",
-    "_checkout": null
+    "_checkout": null,
+    "_copy_without_render": [
+      ".redport/patches/*.patch"
+    ],
+    "_extensions": [
+      "local_extensions.CustomGlobalsExtension"
+    ]
   },
   "_cookiecutter": {
-    "project_title": "",
-    "project_slug": "{{ cookiecutter.project_title.lower().replace(' ', '_').replace('-', '_') }}",
-    "project_description": "",
+    "project_title": "Funiculi",
+    "pypi_package_name": "funiculi",
+    "python_package_name": "funiculi",
+    "project_description": "Control your Denon AVR amplifier from the command line",
     "first_module_name": "api",
     "project_version": "0.1.0",
-    "project_license": [
-      "Apache-2.0",
-      "Proprietary"
-    ],
-    "python_version": "3.11",
+    "project_license": "Apache-2.0",
+    "python_version": "3.8",
     "author_full_name": "Claudia Pellegrino",
     "author_email": "clau@tiqua.de",
-    "copyright_holder_full_name": "{{ cookiecutter.author_full_name }}",
+    "copyright_holder_full_name": "Claudia Pellegrino",
     "github_username": "claui",
     "include_executable": "y",
-    "executable_name": "{{ cookiecutter.project_slug.replace('_', '-') }}",
+    "executable_name": "funiculi",
     "install_dependencies_now": "y"
   }
 }
