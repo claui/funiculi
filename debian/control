@@ -20,7 +20,7 @@ Rules-Requires-Root: no
 
 Package: funiculi
 Architecture: all
-Depends: ${python3:Depends}, ${misc:Depends}, ncat, pulseaudio-dlna, python3-colorama, python3-fire
+Depends: ${python3:Depends}, ${misc:Depends}, pulseaudio-dlna, python3-colorama, python3-fire
 Description: Control Denon amplifiers from the command line (Python 3)
  CLI tool to interact with Denon AVR amplifiers over the local network.
  Turn the unit on and off, change volume, and stream music to it over

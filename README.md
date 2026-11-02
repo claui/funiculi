@@ -11,8 +11,6 @@ power status, changing its volume, and streaming music to it over
 
 You need the following software installed on your system:
 
-- [`ncat`](https://github.com/nmap/nmap/tree/master/ncat#readme)
-
 - [`pulseaudio-dlna`](https://github.com/Cygn/pulseaudio-dlna)
 
 ## Installation
