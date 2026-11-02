@@ -13,7 +13,7 @@ env:
 
 jobs:
   bump-version:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-26.04
     outputs:
       new_version: ${{ steps.gather_new_version.outputs.new_version }}
     steps:
@@ -80,7 +80,7 @@ jobs:
 
   publish-testpypi:
     needs: build-dist
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-26.04
     environment:
       name: testpypi
       url: https://test.pypi.org/p/funiculi
@@ -109,7 +109,7 @@ jobs:
     needs:
       - bump-version
       - publish-testpypi
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-26.04
     steps:
       - name: Check out source tree
         uses: actions/checkout@v4
