@@ -3,6 +3,7 @@
 # Re-export these symbols
 # (This promotes them from funiculi.api to funiculi)
 from funiculi.api import Api as Api
+from funiculi.async_api import AsyncApi as AsyncApi
 
 from funiculi.version import version
 

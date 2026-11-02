@@ -9,7 +9,7 @@ from typing import NoReturn
 import fire  # type: ignore
 
 from . import __version__, api, fire_workarounds
-from .errors import CliError
+from .errors import FuniculiError
 from .logging import get_logger
 from .settings import debugMode, PROJECT_ROOT, PYPROJECT_TOML
 
@@ -33,7 +33,7 @@ def _cli_context(*args: str) -> Generator[list[str], None, NoReturn]:
     fire_workarounds.apply()
     try:
         yield combined_args
-    except CliError as e:
+    except FuniculiError as e:
         if debugMode:
             raise e
         logger.error(e)
