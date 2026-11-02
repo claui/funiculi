@@ -46,7 +46,7 @@ pdoc = ">=14.0"
 poethepoet = ">=0.24"
 pylint = ">=3.0"
 pytest = "*"
-sphinx = ">=7.1.2,<7.2.0"
+sphinx = ">=7.1.2"
 types-colorama = "*"
 
 [tool.poetry.scripts]

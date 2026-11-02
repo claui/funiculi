@@ -7,8 +7,6 @@
     "patches": [
       "patches/disable-install-step.patch"
     ],
-    "nextPatches": [
-      "patches/disable-install-step.patch"
-    ]
+    "nextPatches": []
   }
 }
