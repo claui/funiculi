@@ -10,9 +10,12 @@ from typing import Callable, Optional, Sequence, TYPE_CHECKING
 from .errors import CliError
 from .logging import get_logger
 
-from .settings import \
-    DEFAULT_AVR_CTRL_PORT, DEFAULT_AVR_WEB_PORT, \
-    DEFAULT_CTRL_TIMEOUT_MS, DEFAULT_UPNP_DESCRIPTOR_REMOTE_PATH
+from .settings import (
+    DEFAULT_AVR_CTRL_PORT,
+    DEFAULT_AVR_WEB_PORT,
+    DEFAULT_CTRL_TIMEOUT_MS,
+    DEFAULT_UPNP_DESCRIPTOR_REMOTE_PATH,
+)
 
 
 logger = get_logger(__name__)
@@ -49,7 +52,8 @@ class SourceApi:
 
 
 class Api:
-    """
+    """Primary API client for interacting with a Denon AVR host.
+
     :param host:
         The AVR host to connect to.
 
@@ -72,16 +76,21 @@ class Api:
     source: SourceApi
     """Selects or queries the audio source."""
 
-    def __init__(self,  # pylint: disable=too-many-arguments
-        host: Optional[str]=None,
-        ctrlport: int=DEFAULT_AVR_CTRL_PORT,
-        webport: int=DEFAULT_AVR_WEB_PORT,
-        timeout: float=DEFAULT_CTRL_TIMEOUT_MS,
-        path: str=DEFAULT_UPNP_DESCRIPTOR_REMOTE_PATH,
+    def __init__(  # pylint: disable=too-many-arguments
+        self,
+        host: Optional[str] = None,
+        ctrlport: int = DEFAULT_AVR_CTRL_PORT,
+        webport: int = DEFAULT_AVR_WEB_PORT,
+        timeout: float = DEFAULT_CTRL_TIMEOUT_MS,
+        path: str = DEFAULT_UPNP_DESCRIPTOR_REMOTE_PATH,
     ) -> None:
-        if (merged_host := host or os.environ.get('AVR_HOST', None)) is None:
-            raise CliError('The `--host` switch must be given if ' +
-                'no `AVR_HOST` environment variable is defined.')
+        if (
+            merged_host := host or os.environ.get('AVR_HOST', None)
+        ) is None:
+            raise CliError(
+                'The `--host` switch must be given if '
+                + 'no `AVR_HOST` environment variable is defined.'
+            )
         self._avr_host = merged_host
         self._avr_ctrl_port = ctrlport
         self._avr_web_port = webport
@@ -89,16 +98,13 @@ class Api:
         self._upnp_descriptor_path = path
         self.source = SourceApi(self._send)
 
-
     def off(self) -> None:
         """Turns the device off."""
         self._send('PWSTANDBY')
 
-
     def on(self) -> None:
         """Turns the device on."""
         self._send('PWON')
-
 
     def status(self) -> str:
         """Queries whether the device is on standby.
@@ -129,28 +135,42 @@ class Api:
                 [
                     'pulseaudio-dlna',
                     '--renderer-urls',
-                    f'http://{avr_host_ipv4_addr}:{self._avr_web_port}' \
-                        + self._upnp_descriptor_path
+                    f'http://{avr_host_ipv4_addr}:{self._avr_web_port}'
+                    + self._upnp_descriptor_path,
                 ],
-                check=True)
+                check=True,
+            )
         except subprocess.CalledProcessError as e:
             raise CliError(e) from e
 
     def _send(self, payload: str) -> str:
         f = tempfile.NamedTemporaryFile(  # pylint: disable=consider-using-with
-            mode='w', encoding='ascii', suffix='.funiculi.status',
-            delete=False)
+            mode='w',
+            encoding='ascii',
+            suffix='.funiculi.status',
+            delete=False,
+        )
         f.close()
         logger.debug('Sending command: %s', payload)
         try:
             result = subprocess.run(
                 [
-                    'timeout', str(self._timeout_ms / 1000), 'ncat',
-                    '-C', '-o', f.name, '--no-shutdown', self._avr_host,
+                    'timeout',
+                    str(self._timeout_ms / 1000),
+                    'ncat',
+                    '-C',
+                    '-o',
+                    f.name,
+                    '--no-shutdown',
+                    self._avr_host,
                     str(self._avr_ctrl_port),
                 ],
-                capture_output=True, check=False, encoding='utf-8',
-                input=payload, text=True)
+                capture_output=True,
+                check=False,
+                encoding='utf-8',
+                input=payload,
+                text=True,
+            )
         except OSError as e:
             raise CliError(f'{e.strerror} ({e.filename})') from e
         os.remove(f.name)
@@ -161,8 +181,10 @@ class Api:
         logger.debug('Received response: %s', response_str)
         return response_str
 
+
 def _process_check(
-    process: CompletedProcess, acceptable_exit_codes: Sequence[int]=(0,),
+    process: CompletedProcess,
+    acceptable_exit_codes: Sequence[int] = (0,),
 ) -> None:
     if process.returncode not in acceptable_exit_codes:
         try:
@@ -170,10 +192,14 @@ def _process_check(
         except subprocess.CalledProcessError as e:
             raise CliError(e) from e
 
+
 def _process_log(
-    process: CompletedProcess, acceptable_exit_codes: Sequence[int]=(0,),
+    process: CompletedProcess,
+    acceptable_exit_codes: Sequence[int] = (0,),
 ) -> None:
-    log_level = logging.WARNING \
-        if process.returncode in acceptable_exit_codes \
+    log_level = (
+        logging.WARNING
+        if process.returncode in acceptable_exit_codes
         else logging.ERROR
+    )
     logger.log(log_level, os.linesep.join(process.stderr.splitlines()))

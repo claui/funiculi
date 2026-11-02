@@ -5,8 +5,8 @@
   "tasks": [
     {
       "label": "Funiculi: Show usage help",
-      "type": "shell",
-      "command": "poetry",
+      "type": "process",
+      "command": "uv",
       "args": [
         "run",
         "poe",
@@ -21,8 +21,8 @@
     },
     {
       "label": "Funiculi: Power on",
-      "type": "shell",
-      "command": "poetry",
+      "type": "process",
+      "command": "uv",
       "args": [
         "run",
         "poe",
@@ -41,8 +41,8 @@
     },
     {
       "label": "Funiculi: Power off",
-      "type": "shell",
-      "command": "poetry",
+      "type": "process",
+      "command": "uv",
       "args": [
         "run",
         "poe",
@@ -58,8 +58,8 @@
     },
     {
       "label": "Funiculi: Install/update local dependencies",
-      "type": "shell",
-      "command": "poetry",
+      "type": "process",
+      "command": "uv",
       "args": [
         "update"
       ],
@@ -73,7 +73,7 @@
     {
       "label": "Funiculi: Browse HTML documentation",
       "type": "process",
-      "command": "poetry",
+      "command": "uv",
       "args": [
         "run",
         "poe",
@@ -89,7 +89,7 @@
     {
       "label": "Funiculi: Run static type checker",
       "type": "process",
-      "command": "poetry",
+      "command": "uv",
       "args": [
         "run",
         "poe",

@@ -1,6 +1,68 @@
+[project]
+name = "funiculi"
+version = "0.2.0"
+description = "Control your Denon AVR amplifier from the command line"
+readme = "README.md"
+authors = [{ name = "Claudia Pellegrino", email = "clau@tiqua.de" }]
+license = "Apache-2.0"
+# See https://pypi.org/pypi?%3Aaction=list_classifiers
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Operating System :: MacOS",
+    "Operating System :: POSIX :: Linux",
+    "Topic :: Home Automation",
+    "Topic :: Utilities",
+]
+requires-python = ">=3.8"
+
+dependencies = ["colorama", "fire"]
+
 [build-system]
-requires = ["poetry-core>=1.9.0"]
-build-backend = "poetry.core.masonry.api"
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[dependency-groups]
+dev = ["autopep8", "mypy", "poethepoet", "pylint", "ruff", "types-colorama"]
+doc = [
+    "myst-parser",
+    "sphinx",
+
+    # https://github.com/readthedocs/sphinx-autoapi/issues/536
+    "sphinx-autoapi;python_version==\"3.8\"",
+    "sphinx-autoapi>=3.6.1;python_version>\"3.8\"",
+
+    "sphinx-rtd-theme",
+]
+test = ["pytest"]
+
+[project.scripts]
+funiculi = "funiculi.cli:run"
+
+[project.urls]
+documentation = "https://funiculi.readthedocs.io/en/stable/"
+source = "https://github.com/claui/funiculi"
+
+[tool.bumpversion]
+current_version = "0.2.0"
+parse = "(?P<major>\\d+)\\.(?P<minor>\\d+)\\.(?P<patch>\\d+)"
+serialize = ["{major}.{minor}.{patch}"]
+search = "{current_version}"
+replace = "{new_version}"
+regex = false
+ignore_missing_version = false
+ignore_missing_files = false
+tag = false
+sign_tags = false
+tag_name = "v{new_version}"
+tag_message = "Bump version to {new_version}"
+allow_dirty = true
+commit = false
+message = "Bump version to {new_version}"
+moveable_tags = []
+commit_args = ""
+setup_hooks = []
+pre_commit_hooks = []
+post_commit_hooks = []
 
 [tool.mypy]
 check_untyped_defs = true
@@ -18,40 +80,6 @@ warn_redundant_casts = true
 warn_return_any = true
 warn_unused_ignores = true
 
-[tool.poetry]
-name = "funiculi"
-version = "0.2.0"
-description = "Control your Denon AVR amplifier from the command line"
-readme = ["README.md", "USAGE.md"]
-authors = ["Claudia Pellegrino <clau@tiqua.de>"]
-license = "Apache-2.0"
-classifiers = [
-    "Development Status :: 3 - Alpha",
-    "Operating System :: MacOS",
-    "Operating System :: POSIX :: Linux",
-    "Topic :: Home Automation",
-    "Topic :: Utilities",
-]
-
-[tool.poetry.dependencies]
-python = ">=3.8"
-colorama = "*"
-fire = "*"
-
-[tool.poetry.group.dev.dependencies]
-autopep8 = "*"
-mypy = ">=1.8"
-myst-parser = ">=2.0.0"
-pdoc = ">=14.0"
-poethepoet = ">=0.24"
-pylint = ">=3.0"
-pytest = "*"
-sphinx = ">=7.1.2"
-types-colorama = "*"
-
-[tool.poetry.scripts]
-funiculi = "funiculi.cli:run"
-
 [tool.poe]
 verbosity = -1
 
@@ -60,11 +88,18 @@ tasks.cmd = "poe -v"
 tasks.help = "List available tasks"
 cli.script = "funiculi.cli:run"
 cli.help = "Run command line interface"
-doc.cmd = "sphinx-build -aqEW -b man doc/sphinx build/man"
+doc.shell = """
+    set -ex
+    rm -rf build/html build/man
+    sphinx-build -aqEW -b html doc/sphinx build/html
+    sphinx-build -qW -b man doc/sphinx build/man
+"""
 doc.help = "Generate documentation"
-html.cmd = "pdoc funiculi !funiculi.settings"
+formatcheck.cmd = "ruff format --check"
+formatcheck.help = "Check for formatting style violations not covered by the linter"
+html.script = "webbrowser:open('build/html/index.html')"
 html.help = "Browse HTML documentation"
-linter.cmd = "pylint --enable-all-extensions funiculi"
+linter.cmd = "pylint --enable-all-extensions funiculi tests"
 linter.help = "Check for style violations"
 man.cmd = "man build/man/funiculi.1"
 man.help = "Open manual page"
@@ -73,15 +108,22 @@ tests.help = "Run test suite"
 typecheck.cmd = "mypy"
 typecheck.help = "Run static type checker"
 
+[tool.pylint]
+"messages control".disable = [
+    "consider-alternative-union-syntax",
+    "empty-comment",
+    "useless-import-alias",
+]
+
 [tool.pyright]
 reportUnsupportedDunderAll = "none"
-
-[tool.pytest.ini_options]
-testpaths = "tests"
-xfail_strict = true
 
 [tool.ruff]
 line-length = 72
 
 [tool.ruff.format]
 quote-style = "single"
+
+[tool.uv]
+default-groups = ["dev", "doc", "test"]
+fork-strategy = "fewest"

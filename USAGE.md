@@ -1,4 +1,4 @@
-<!-- markdownlint-configure-file { "MD041": { "level": 1 } } -->
+<!-- markdownlint-configure-file { "MD025": { "level": 2 } } -->
 
 # Synopsis
 
@@ -77,6 +77,10 @@ The default value is: `/upnp/desc/aios_device/aios_device.xml`
 # Environment
 
 Funiculi supports the following environment variable:
+
+`AVR_HOST`
+: Hostname or IP address of the AVR host to connect to if no
+: `-H`, `--host` parameter is given.
 
 `FUNICULI_DEBUG`
 : If set to a non-zero value, causes Funiculi to enable debug-level

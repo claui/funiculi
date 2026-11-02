@@ -1,4 +1,5 @@
 """Custom error types."""
 
+
 class CliError(Exception):
-    """An user-facing error message."""
+    """A user-facing error message."""
