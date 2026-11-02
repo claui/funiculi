@@ -31,6 +31,12 @@ Acceptable values vary by model. To find out the values for a
 specific model, omit this parameter while your device is set to a
 known source. Repeat for each source.
 
+`volume [get | set LEVEL]`
+: Queries or sets the master volume.
+The `get` subcommand returns the current volume level (0–98).
+The `set` subcommand accepts a volume level between 0 and 98 in
+steps of 0.5.
+
 `status`
 : Queries whether the device is on standby.
 

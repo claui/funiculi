@@ -4,7 +4,7 @@ import asyncio
 import socket
 import subprocess
 
-from .async_api import AsyncApi, AsyncSourceApi
+from .async_api import AsyncApi, AsyncSourceApi, AsyncVolumeApi
 from .errors import CliError
 from .settings import (
     DEFAULT_AVR_CTRL_PORT,
@@ -12,6 +12,31 @@ from .settings import (
     DEFAULT_CTRL_TIMEOUT_MS,
     DEFAULT_UPNP_DESCRIPTOR_REMOTE_PATH,
 )
+
+
+class VolumeApi:
+    """Queries or sets the master volume."""
+
+    def __init__(self, volume: AsyncVolumeApi) -> None:
+        self._volume = volume
+
+    def get(self) -> float | None:
+        """Queries the master volume level.
+
+        :return:
+            The volume level between 0 and 98, or `None` if the AVR
+            did not respond.
+        """
+        return asyncio.run(self._volume.get())
+
+    def set(self, level: float) -> str | None:
+        """Sets the master volume level.
+
+        :param level: The volume level between 0 and 98.
+
+        :raises ValueError: if `level` is out of range.
+        """
+        return asyncio.run(self._volume.set(level))
 
 
 class SourceApi:
@@ -62,6 +87,9 @@ class Api:
     source: SourceApi
     """Selects or queries the audio source."""
 
+    volume: VolumeApi
+    """Queries or sets the master volume."""
+
     def __init__(  # pylint: disable=too-many-arguments
         self,
         host: str | None = None,
@@ -75,6 +103,7 @@ class Api:
         self._avr_web_port = webport
         self._upnp_descriptor_path = path
         self.source = SourceApi(self._async_api.source)
+        self.volume = VolumeApi(self._async_api.volume)
 
     def off(self) -> None:
         """Turns the device off."""

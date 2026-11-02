@@ -58,6 +58,9 @@ funiculi [FLAGS] COMMAND
 - `source [get | set NAME]`  
   Selects or queries the audio source.
 
+- `volume [get | set LEVEL]`  
+  Queries or sets the master volume (0–98, in steps of 0.5).
+
 - `status`  
   Queries whether the device is on standby.
 

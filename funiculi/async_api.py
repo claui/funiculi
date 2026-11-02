@@ -7,6 +7,76 @@ from .connection import Connection
 from .errors import CliError
 from .settings import DEFAULT_AVR_CTRL_PORT, DEFAULT_CTRL_TIMEOUT_MS
 
+VOLUME_MIN = 0.0
+VOLUME_MAX = 98.0
+VOLUME_MAX_PAYLOAD = 'MAX'
+
+
+def parse_volume(payload: str) -> float:
+    """Parses a master volume payload per Denon’s protocol.
+
+    :param payload:
+        The response payload without the `MV` prefix, e.g. `40` or
+        `40.5` or `MAX`.
+
+    :return: The volume level between 0 and 98.
+
+    :raises ValueError: if the payload is not a volume level.
+    """
+    if payload == VOLUME_MAX_PAYLOAD:
+        return VOLUME_MAX
+    try:
+        return float(payload)
+    except ValueError as error:
+        raise ValueError(f'Not a volume level: {payload}') from error
+
+
+def format_volume(level: float) -> str:
+    """Formats a master volume level per Denon’s protocol.
+
+    :param level: The volume level between 0 and 98.
+
+    :return: The payload without the `MV` prefix, e.g. `40` or `40.5`.
+
+    :raises ValueError: if `level` is out of range.
+    """
+    if not VOLUME_MIN <= level <= VOLUME_MAX:
+        raise ValueError(
+            f'Volume level out of range: {level}'
+            f' ({VOLUME_MIN:g}–{VOLUME_MAX:g})'
+        )
+    return f'{level:g}'
+
+
+class AsyncVolumeApi:
+    """Queries or sets the master volume."""
+
+    def __init__(
+        self, send: Callable[[str], Awaitable[str | None]]
+    ) -> None:
+        self._send = send
+
+    async def get(self) -> float | None:
+        """Queries the master volume level.
+
+        :return:
+            The volume level between 0 and 98, or `None` if the AVR
+            did not respond.
+        """
+        response = await self._send('MV?')
+        if response is None or not response.startswith('MV'):
+            return None
+        return parse_volume(response[2:])
+
+    async def set(self, level: float) -> str | None:
+        """Sets the master volume level.
+
+        :param level: The volume level between 0 and 98.
+
+        :raises ValueError: if `level` is out of range.
+        """
+        return await self._send(f'MV{format_volume(level)}')
+
 
 class AsyncSourceApi:
     """Selects or queries the audio source."""
@@ -57,6 +127,9 @@ class AsyncApi:
     source: AsyncSourceApi
     """Selects or queries the audio source."""
 
+    volume: AsyncVolumeApi
+    """Queries or sets the master volume."""
+
     def __init__(
         self,
         host: str | None = None,
@@ -74,6 +147,7 @@ class AsyncApi:
         self._avr_ctrl_port = ctrlport
         self._timeout_s = timeout / 1000
         self.source = AsyncSourceApi(self._send)
+        self.volume = AsyncVolumeApi(self._send)
 
     @property
     def host(self) -> str:

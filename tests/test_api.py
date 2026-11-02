@@ -16,7 +16,7 @@ class FakeDenon:
     def __init__(self) -> None:
         self.power = 'PWSTANDBY'
         self.source = 'TV'
-        self.volume = 40
+        self.volume: float = 40
         self.port: int | None = None
         self.commands: list[str] = []
 
@@ -33,7 +33,12 @@ class FakeDenon:
         elif command.startswith('SI'):
             self.source = command[2:]
         elif command == 'MV?':
-            return f'MV{self.volume:02}'
+            return f'MV{self.volume:g}'
+        elif command.startswith('MV') and command not in (
+            'MVUP',
+            'MVDOWN',
+        ):
+            self.volume = float(command[2:])
         elif command == 'MVUP':
             self.volume += 1
         elif command == 'MVDOWN':
@@ -139,6 +144,31 @@ def test_async_source_get_and_set(avr: FakeDenon) -> None:
         return before, after
 
     assert asyncio.run(scenario()) == ('TV', 'PHONO')
+
+
+def test_volume_get_and_set(avr: FakeDenon) -> None:
+    api = make_api(avr)
+    assert api.volume.get() == 40
+    api.volume.set(40.5)
+    assert avr.volume == 40.5
+    assert api.volume.get() == 40.5
+
+
+def test_volume_set_out_of_range(avr: FakeDenon) -> None:
+    api = make_api(avr)
+    with pytest.raises(ValueError, match='out of range'):
+        api.volume.set(99)
+
+
+def test_async_volume_get_and_set(avr: FakeDenon) -> None:
+    async def scenario() -> tuple[float | None, float | None]:
+        api = make_async_api(avr)
+        before = await api.volume.get()
+        await api.volume.set(12)
+        after = await api.volume.get()
+        return before, after
+
+    assert asyncio.run(scenario()) == (40, 12)
 
 
 def test_connection_failure_raises() -> None:
