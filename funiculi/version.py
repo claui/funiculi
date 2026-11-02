@@ -2,12 +2,11 @@
 
 from contextlib import suppress
 import importlib.metadata
-from typing import Optional
 
 from .settings import PYPROJECT_TOML
 
 
-def version() -> Optional[str]:
+def version() -> str | None:
     """Attempts to return a version number for this project.
 
     Checks both `pyproject.toml` in the development tree and the

@@ -1,11 +1,12 @@
 """The primary module in funiculi."""
 
+from collections.abc import Callable, Sequence
 import logging
 import os
 import socket
 import subprocess
 import tempfile
-from typing import Callable, Optional, Sequence, TYPE_CHECKING
+from typing import TYPE_CHECKING
 
 from .errors import CliError
 from .logging import get_logger
@@ -78,7 +79,7 @@ class Api:
 
     def __init__(  # pylint: disable=too-many-arguments
         self,
-        host: Optional[str] = None,
+        host: str | None = None,
         ctrlport: int = DEFAULT_AVR_CTRL_PORT,
         webport: int = DEFAULT_AVR_WEB_PORT,
         timeout: float = DEFAULT_CTRL_TIMEOUT_MS,

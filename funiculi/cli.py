@@ -1,9 +1,10 @@
 """Entry point for the command line interface."""
 
+from collections.abc import Generator
 from contextlib import contextmanager
 import os
 import sys
-from typing import Generator, List, NoReturn
+from typing import NoReturn
 
 import fire  # type: ignore
 
@@ -23,7 +24,7 @@ def run(*args: str) -> None:
 
 
 @contextmanager
-def _cli_context(*args: str) -> Generator[List[str], None, NoReturn]:
+def _cli_context(*args: str) -> Generator[list[str], None, NoReturn]:
     combined_args = list(args) + sys.argv[1:]
     if combined_args and combined_args[0] in {'-V', '--version'}:
         print(_version_text())
