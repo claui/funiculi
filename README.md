@@ -75,8 +75,8 @@ See [`CONTRIBUTING.md`](https://github.com/claui/funiculi/blob/main/CONTRIBUTING
 
 ## License
 
-Copyright (c) 2024 Claudia Pellegrino
+Copyright (c) 2024–2026 Claudia Pellegrino
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
-For a copy of the License, see [LICENSE](https://github.com/claui/funiculi/blob/main/LICENSE).
+For a copy of the License, see [LICENSE](https://raw.githubusercontent.com/claui/funiculi/refs/heads/main/LICENSE).
