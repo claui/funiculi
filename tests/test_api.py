@@ -44,12 +44,10 @@ class FakeDenon:
         if command == 'MV?':
             return f'MV{self.volume:g}'
         if command == 'MVUP':
-            self._step_volume(1)
-        elif command == 'MVDOWN':
-            self._step_volume(-1)
-        else:
-            return self._set_volume(command)
-        return None
+            return self._step_volume(1)
+        if command == 'MVDOWN':
+            return self._step_volume(-1)
+        return self._set_volume(command)
 
     def _select_source(self, command: str) -> str | None:
         if self.power != 'PWON':
@@ -57,9 +55,10 @@ class FakeDenon:
         self.source = command[2:]
         return command
 
-    def _step_volume(self, delta: int) -> None:
+    def _step_volume(self, delta: int) -> str | None:
         if self.power == 'PWON':
             self.volume += delta
+        return f'MV{self.volume:g}'
 
     def _set_volume(self, command: str) -> str | None:
         if self.power != 'PWON':

@@ -79,17 +79,19 @@ class AsyncVolumeApi:
             if the AVR sent no acknowledgment, e.g. because it is
             on standby.
         """
-        payload = f'MV{format_volume(level)}'
-        if await self._send(payload) is None:
-            raise NoResponse(f'The AVR did not acknowledge {payload}.')
+        await self._try_send(f'MV{format_volume(level)}')
 
     async def down(self) -> None:
         """Turns the volume down one step."""
-        await self._send('MVDOWN')
+        await self._try_send('MVDOWN')
 
     async def up(self) -> None:
         """Turns the volume up one step."""
-        await self._send('MVUP')
+        await self._try_send('MVUP')
+
+    async def _try_send(self, payload: str) -> None:
+        if await self._send(payload) is None:
+            raise NoResponse(f'The AVR did not acknowledge {payload}.')
 
 
 class AsyncSourceApi:
