@@ -7,7 +7,7 @@ from collections.abc import Iterator
 import pytest
 
 from funiculi import Api, AsyncApi
-from funiculi.errors import CliError, ConnectionFailed
+from funiculi.errors import CliError, ConnectionFailed, NoResponse
 
 
 class FakeDenon:
@@ -22,28 +22,50 @@ class FakeDenon:
 
     def respond(self, command: str) -> str | None:
         self.commands.append(command)
+        if command.startswith('SI'):
+            return self._source_command(command)
+        if command.startswith('MV'):
+            return self._volume_command(command)
+        return self._power_command(command)
+
+    def _power_command(self, command: str) -> str | None:
         if command == 'PW?':
             return self.power
-        if command == 'PWON':
-            self.power = 'PWON'
-        elif command == 'PWSTANDBY':
-            self.power = 'PWSTANDBY'
-        elif command == 'SI?':
-            return f'SI{self.source}'
-        elif command.startswith('SI'):
-            self.source = command[2:]
-        elif command == 'MV?':
-            return f'MV{self.volume:g}'
-        elif command.startswith('MV') and command not in (
-            'MVUP',
-            'MVDOWN',
-        ):
-            self.volume = float(command[2:])
-        elif command == 'MVUP':
-            self.volume += 1
-        elif command == 'MVDOWN':
-            self.volume -= 1
+        if command in {'PWON', 'PWSTANDBY'}:
+            self.power = command
         return None
+
+    def _source_command(self, command: str) -> str | None:
+        if command == 'SI?':
+            return f'SI{self.source}'
+        return self._select_source(command)
+
+    def _volume_command(self, command: str) -> str | None:
+        if command == 'MV?':
+            return f'MV{self.volume:g}'
+        if command == 'MVUP':
+            self._step_volume(1)
+        elif command == 'MVDOWN':
+            self._step_volume(-1)
+        else:
+            return self._set_volume(command)
+        return None
+
+    def _select_source(self, command: str) -> str | None:
+        if self.power != 'PWON':
+            return None
+        self.source = command[2:]
+        return command
+
+    def _step_volume(self, delta: int) -> None:
+        if self.power == 'PWON':
+            self.volume += delta
+
+    def _set_volume(self, command: str) -> str | None:
+        if self.power != 'PWON':
+            return None
+        self.volume = float(command[2:])
+        return command
 
     async def handle(
         self,
@@ -109,6 +131,7 @@ def test_on_and_off_round_trip(avr: FakeDenon) -> None:
 
 def test_volume_steps_reach_the_device(avr: FakeDenon) -> None:
     api = make_api(avr)
+    api.on()
     api.up()
     assert avr.volume == 41
     api.down()
@@ -116,9 +139,21 @@ def test_volume_steps_reach_the_device(avr: FakeDenon) -> None:
     assert avr.volume == 39
 
 
+def test_volume_steps_via_sub_api(avr: FakeDenon) -> None:
+    api = make_api(avr)
+    api.on()
+    api.volume.up()
+    assert avr.volume == 41
+    api.volume.down()
+    assert avr.volume == 40
+
+
 def test_source_get_and_set(avr: FakeDenon) -> None:
     api = make_api(avr)
     assert api.source.get() == 'TV'
+    with pytest.raises(NoResponse):
+        api.source.set('aux')
+    api.on()
     api.source.set('aux')
     assert avr.source == 'AUX'
     assert api.source.get() == 'AUX'
@@ -139,6 +174,7 @@ def test_async_source_get_and_set(avr: FakeDenon) -> None:
     async def scenario() -> tuple[str, str]:
         api = make_async_api(avr)
         before = await api.source.get()
+        await api.on()
         await api.source.set('phono')
         after = await api.source.get()
         return before, after
@@ -149,6 +185,9 @@ def test_async_source_get_and_set(avr: FakeDenon) -> None:
 def test_volume_get_and_set(avr: FakeDenon) -> None:
     api = make_api(avr)
     assert api.volume.get() == 40
+    with pytest.raises(NoResponse):
+        api.volume.set(40.5)
+    api.on()
     api.volume.set(40.5)
     assert avr.volume == 40.5
     assert api.volume.get() == 40.5
@@ -164,11 +203,25 @@ def test_async_volume_get_and_set(avr: FakeDenon) -> None:
     async def scenario() -> tuple[float | None, float | None]:
         api = make_async_api(avr)
         before = await api.volume.get()
+        await api.on()
         await api.volume.set(12)
         after = await api.volume.get()
         return before, after
 
     assert asyncio.run(scenario()) == (40, 12)
+
+
+def test_async_setters_raise_no_response_in_standby(
+    avr: FakeDenon,
+) -> None:
+    async def scenario() -> None:
+        api = make_async_api(avr)
+        with pytest.raises(NoResponse):
+            await api.volume.set(10)
+        with pytest.raises(NoResponse):
+            await api.source.set('TV')
+
+    asyncio.run(scenario())
 
 
 def test_connection_failure_raises() -> None:

@@ -4,7 +4,7 @@ import os
 from collections.abc import Awaitable, Callable
 
 from .connection import Connection
-from .errors import CliError
+from .errors import CliError, NoResponse
 from .settings import DEFAULT_AVR_CTRL_PORT, DEFAULT_CTRL_TIMEOUT_MS
 
 VOLUME_MIN = 0.0
@@ -68,14 +68,28 @@ class AsyncVolumeApi:
             return None
         return parse_volume(response[2:])
 
-    async def set(self, level: float) -> str | None:
+    async def set(self, level: float) -> None:
         """Sets the master volume level.
 
         :param level: The volume level between 0 and 98.
 
         :raises ValueError: if `level` is out of range.
+
+        :raises NoResponse:
+            if the AVR sent no acknowledgment, e.g. because it is
+            on standby.
         """
-        return await self._send(f'MV{format_volume(level)}')
+        payload = f'MV{format_volume(level)}'
+        if await self._send(payload) is None:
+            raise NoResponse(f'The AVR did not acknowledge {payload}.')
+
+    async def down(self) -> None:
+        """Turns the volume down one step."""
+        await self._send('MVDOWN')
+
+    async def up(self) -> None:
+        """Turns the volume up one step."""
+        await self._send('MVUP')
 
 
 class AsyncSourceApi:
@@ -95,7 +109,7 @@ class AsyncSourceApi:
         """
         return (await self._send('SI?') or '')[2:]
 
-    async def set(self, name: str) -> str | None:
+    async def set(self, name: str) -> None:
         """Selects an audio source.
 
         :param name:
@@ -104,8 +118,15 @@ class AsyncSourceApi:
             Acceptable values vary by model. To find out the values
             for a specific model, omit this parameter while your
             device is set to a known source. Repeat for each source.
+
+        :raises NoResponse:
+            if the AVR sent no acknowledgment, e.g. because it is
+            on standby.
         """
-        return await self._send(f'SI{name.upper()}')
+        if await self._send(f'SI{name.upper()}') is None:
+            raise NoResponse(
+                f'The AVR did not acknowledge source {name.upper()}.'
+            )
 
 
 class AsyncApi:
@@ -170,14 +191,6 @@ class AsyncApi:
             on, or an empty string if the AVR did not respond.
         """
         return await self._send('PW?') or ''
-
-    async def down(self) -> None:
-        """Turns the volume down one step."""
-        await self._send('MVDOWN')
-
-    async def up(self) -> None:
-        """Turns the volume up one step."""
-        await self._send('MVUP')
 
     async def _send(self, payload: str) -> str | None:
         async with Connection(

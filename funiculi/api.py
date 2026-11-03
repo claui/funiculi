@@ -29,14 +29,26 @@ class VolumeApi:
         """
         return asyncio.run(self._volume.get())
 
-    def set(self, level: float) -> str | None:
+    def set(self, level: float) -> None:
         """Sets the master volume level.
 
         :param level: The volume level between 0 and 98.
 
         :raises ValueError: if `level` is out of range.
+
+        :raises NoResponse:
+            if the AVR sent no acknowledgment, e.g. because it is
+            on standby.
         """
-        return asyncio.run(self._volume.set(level))
+        asyncio.run(self._volume.set(level))
+
+    def down(self) -> None:
+        """Turns the volume down one step."""
+        asyncio.run(self._volume.down())
+
+    def up(self) -> None:
+        """Turns the volume up one step."""
+        asyncio.run(self._volume.up())
 
 
 class SourceApi:
@@ -49,7 +61,7 @@ class SourceApi:
         """Queries the current audio source."""
         return asyncio.run(self._source.get())
 
-    def set(self, name: str) -> str | None:
+    def set(self, name: str) -> None:
         """Selects an audio source.
 
         :param name:
@@ -58,8 +70,12 @@ class SourceApi:
             Acceptable values vary by model. To find out the values
             for a specific model, omit this parameter while your
             device is set to a known source. Repeat for each source.
+
+        :raises NoResponse:
+            if the AVR sent no acknowledgment, e.g. because it is
+            on standby.
         """
-        return asyncio.run(self._source.set(name))
+        asyncio.run(self._source.set(name))
 
 
 class Api:
@@ -124,11 +140,11 @@ class Api:
 
     def down(self) -> None:
         """Turns the volume down one step."""
-        asyncio.run(self._async_api.down())
+        asyncio.run(self._async_api.volume.down())
 
     def up(self) -> None:
         """Turns the volume up one step."""
-        asyncio.run(self._async_api.up())
+        asyncio.run(self._async_api.volume.up())
 
     def dlna(self) -> None:
         """Sets up a local virtual output device that relays all audio
