@@ -1,0 +1,30 @@
+name: Publish to PyPI on tag
+
+on:
+  push:
+    tags:
+      - "v*"
+
+jobs:
+  build-dist:
+    uses: ./.github/workflows/build-dist.yml
+    with:
+      ref: ${{ github.ref }}
+
+  publish-pypi:
+    needs: build-dist
+    runs-on: ubuntu-26.04
+    environment:
+      name: pypi
+      url: https://pypi.org/p/funiculi
+    permissions:
+      id-token: write
+    steps:
+      - name: Download the distributions
+        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333  # v8
+        with:
+          name: python-package-distributions
+          path: dist/
+
+      - name: Publish to PyPI
+        uses: pypa/gh-action-pypi-publish@7245906fb61fa33a13554f9d5fb856fe61758086  # release/v1
