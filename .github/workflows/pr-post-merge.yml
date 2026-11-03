@@ -39,12 +39,6 @@ jobs:
       - name: Publish to PyPI
         uses: pypa/gh-action-pypi-publish@7245906fb61fa33a13554f9d5fb856fe61758086  # release/v1
 
-      - name: Sign the distributions
-        uses: sigstore/gh-action-sigstore-python@61f6a500bbfdd9a2a339cf033e5421951fbc1cd2  # v2.1.1
-        with:
-          inputs: >-
-            dist/*.tar.gz
-            dist/*.whl
 
       - name: Create draft release
         env:
