@@ -1,16 +1,11 @@
 """The primary module in funiculi."""
 
-from collections.abc import Callable, Sequence
-import logging
-import os
+import asyncio
 import socket
 import subprocess
-import tempfile
-from typing import TYPE_CHECKING
 
+from .async_api import AsyncApi, AsyncSourceApi, AsyncVolumeApi
 from .errors import CliError
-from .logging import get_logger
-
 from .settings import (
     DEFAULT_AVR_CTRL_PORT,
     DEFAULT_AVR_WEB_PORT,
@@ -19,27 +14,54 @@ from .settings import (
 )
 
 
-logger = get_logger(__name__)
+class VolumeApi:
+    """Queries or sets the master volume."""
 
+    def __init__(self, volume: AsyncVolumeApi) -> None:
+        self._volume = volume
 
-# https://github.com/python/mypy/issues/5264#issuecomment-399407428
-if TYPE_CHECKING:  # pylint: disable=consider-ternary-expression
-    CompletedProcess = subprocess.CompletedProcess[str]
-else:
-    CompletedProcess = subprocess.CompletedProcess
+    def get(self) -> float | None:
+        """Queries the master volume level.
+
+        :return:
+            The volume level between 0 and 98, or `None` if the AVR
+            did not respond.
+        """
+        return asyncio.run(self._volume.get())
+
+    def set(self, level: float) -> None:
+        """Sets the master volume level.
+
+        :param level: The volume level between 0 and 98.
+
+        :raises ValueError: if `level` is out of range.
+
+        :raises NoResponse:
+            if the AVR sent no acknowledgment, e.g. because it is
+            on standby.
+        """
+        asyncio.run(self._volume.set(level))
+
+    def down(self) -> None:
+        """Turns the volume down one step."""
+        asyncio.run(self._volume.down())
+
+    def up(self) -> None:
+        """Turns the volume up one step."""
+        asyncio.run(self._volume.up())
 
 
 class SourceApi:
     """Selects or queries the audio source."""
 
-    def __init__(self, send: Callable[[str], str]) -> None:
-        self._send = send
+    def __init__(self, source: AsyncSourceApi) -> None:
+        self._source = source
 
     def get(self) -> str:
         """Queries the current audio source."""
-        return self._send('SI?')[2:]
+        return asyncio.run(self._source.get())
 
-    def set(self, name: str) -> str:
+    def set(self, name: str) -> None:
         """Selects an audio source.
 
         :param name:
@@ -48,12 +70,16 @@ class SourceApi:
             Acceptable values vary by model. To find out the values
             for a specific model, omit this parameter while your
             device is set to a known source. Repeat for each source.
+
+        :raises NoResponse:
+            if the AVR sent no acknowledgment, e.g. because it is
+            on standby.
         """
-        return self._send(f'SI{name.upper()}')
+        asyncio.run(self._source.set(name))
 
 
 class Api:
-    """Primary API client for interacting with a Denon AVR host.
+    """Controls a Denon AVR over its telnet protocol.
 
     :param host:
         The AVR host to connect to.
@@ -77,6 +103,9 @@ class Api:
     source: SourceApi
     """Selects or queries the audio source."""
 
+    volume: VolumeApi
+    """Queries or sets the master volume."""
+
     def __init__(  # pylint: disable=too-many-arguments
         self,
         host: str | None = None,
@@ -85,27 +114,20 @@ class Api:
         timeout: float = DEFAULT_CTRL_TIMEOUT_MS,
         path: str = DEFAULT_UPNP_DESCRIPTOR_REMOTE_PATH,
     ) -> None:
-        if (
-            merged_host := host or os.environ.get('AVR_HOST', None)
-        ) is None:
-            raise CliError(
-                'The `--host` switch must be given if '
-                + 'no `AVR_HOST` environment variable is defined.'
-            )
-        self._avr_host = merged_host
-        self._avr_ctrl_port = ctrlport
+        self._async_api = AsyncApi(host, ctrlport, timeout)
+        self._avr_host = self._async_api.host
         self._avr_web_port = webport
-        self._timeout_ms = timeout
         self._upnp_descriptor_path = path
-        self.source = SourceApi(self._send)
+        self.source = SourceApi(self._async_api.source)
+        self.volume = VolumeApi(self._async_api.volume)
 
     def off(self) -> None:
         """Turns the device off."""
-        self._send('PWSTANDBY')
+        asyncio.run(self._async_api.off())
 
     def on(self) -> None:
         """Turns the device on."""
-        self._send('PWON')
+        asyncio.run(self._async_api.on())
 
     def status(self) -> str:
         """Queries whether the device is on standby.
@@ -114,15 +136,15 @@ class Api:
             `PWSTANDBY` if it is on standby, `PWON` if it is turned
             on.
         """
-        return self._send('PW?')
+        return asyncio.run(self._async_api.status())
 
     def down(self) -> None:
         """Turns the volume down one step."""
-        self._send('MVDOWN')
+        asyncio.run(self._async_api.volume.down())
 
     def up(self) -> None:
         """Turns the volume up one step."""
-        self._send('MVUP')
+        asyncio.run(self._async_api.volume.up())
 
     def dlna(self) -> None:
         """Sets up a local virtual output device that relays all audio
@@ -143,64 +165,3 @@ class Api:
             )
         except subprocess.CalledProcessError as e:
             raise CliError(e) from e
-
-    def _send(self, payload: str) -> str:
-        f = tempfile.NamedTemporaryFile(  # pylint: disable=consider-using-with
-            mode='w',
-            encoding='ascii',
-            suffix='.funiculi.status',
-            delete=False,
-        )
-        f.close()
-        logger.debug('Sending command: %s', payload)
-        try:
-            result = subprocess.run(
-                [
-                    'timeout',
-                    str(self._timeout_ms / 1000),
-                    'ncat',
-                    '-C',
-                    '-o',
-                    f.name,
-                    '--no-shutdown',
-                    self._avr_host,
-                    str(self._avr_ctrl_port),
-                ],
-                capture_output=True,
-                check=False,
-                encoding='utf-8',
-                input=payload,
-                text=True,
-            )
-        except OSError as e:
-            raise CliError(f'{e.strerror} ({e.filename})') from e
-        os.remove(f.name)
-        if result.stderr:
-            _process_log(result, acceptable_exit_codes=(0, 124))
-            _process_check(result, acceptable_exit_codes=(0, 124))
-        response_str = os.linesep.join(result.stdout.splitlines())
-        logger.debug('Received response: %s', response_str)
-        return response_str
-
-
-def _process_check(
-    process: CompletedProcess,
-    acceptable_exit_codes: Sequence[int] = (0,),
-) -> None:
-    if process.returncode not in acceptable_exit_codes:
-        try:
-            process.check_returncode()
-        except subprocess.CalledProcessError as e:
-            raise CliError(e) from e
-
-
-def _process_log(
-    process: CompletedProcess,
-    acceptable_exit_codes: Sequence[int] = (0,),
-) -> None:
-    log_level = (
-        logging.WARNING
-        if process.returncode in acceptable_exit_codes
-        else logging.ERROR
-    )
-    logger.log(log_level, os.linesep.join(process.stderr.splitlines()))

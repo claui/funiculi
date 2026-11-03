@@ -30,6 +30,19 @@ protocol; the name is case-insensitive.
 Acceptable values vary by model. To find out the values for a
 specific model, omit this parameter while your device is set to a
 known source. Repeat for each source.
+The `set` subcommand fails with a nonzero exit status if the device
+does not acknowledge the selection, which usually means that it is
+on standby.
+
+`volume [get | set LEVEL | up | down]`
+: Queries or changes the master volume.
+The `get` subcommand returns the current volume level (0–98).
+The `set` subcommand accepts a volume level between 0 and 98 in
+steps of 0.5.
+The `up` and `down` subcommands change the volume by one step.
+The `set` subcommand fails with a nonzero exit status if the device
+does not acknowledge the new level, which usually means that it is
+on standby.
 
 `status`
 : Queries whether the device is on standby.
