@@ -93,7 +93,7 @@ jobs:
     runs-on: ubuntu-26.04
     environment:
       name: testpypi
-      url: https://test.pypi.org/p/${{ cookiecutter.pypi_package_name }}
+      url: https://test.pypi.org/p/funiculi
     permissions:
       id-token: write
     steps:
