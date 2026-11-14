@@ -9,7 +9,7 @@ on:
         required: true
 
 env:
-  CI_UV_VERSION: "0.13.6"
+  CI_UV_VERSION: "0.13.7"
 
 jobs:
   bump-version:
@@ -18,10 +18,10 @@ jobs:
       new_version: ${{ steps.gather_new_version.outputs.new_version }}
     steps:
       - name: Check out source tree
-        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262  # v4
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
 
       - name: Install uv
-        uses: astral-sh/setup-uv@e58605a9b6da7c637471fab8847a5e5a6b8df081  # v5
+        uses: astral-sh/setup-uv@e58605a9b6da7c637471fab8847a5e5a6b8df081 # v5
         with:
           version: ${{ env.CI_UV_VERSION }}
 
@@ -31,7 +31,17 @@ jobs:
       - name: Bump package version
         env:
           TARGET_VERSION: ${{ inputs.target_version }}
-        run: uvx bump-my-version bump "${TARGET_VERSION}"
+        run: |
+          is_keyword="$(
+            uvx bump-my-version show --format=json parts \
+              | jq -r --arg requested "${TARGET_VERSION}" \
+                '.parts | has($requested)'
+          )"
+          if [ "${is_keyword}" == 'true' ]; then
+            uvx bump-my-version bump "${TARGET_VERSION}"
+          else
+            uvx bump-my-version bump --new-version="${TARGET_VERSION}"
+          fi
 
       - id: gather_new_version
         name: Gather bumped package version
@@ -83,21 +93,20 @@ jobs:
     runs-on: ubuntu-26.04
     environment:
       name: testpypi
-      url: https://test.pypi.org/p/funiculi
+      url: https://test.pypi.org/p/${{ cookiecutter.pypi_package_name }}
     permissions:
       id-token: write
     steps:
       - name: Download the distributions
-        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333  # v8
+        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8
         with:
           name: python-package-distributions
           path: dist/
 
       - name: Publish to TestPyPI
-        uses: pypa/gh-action-pypi-publish@7245906fb61fa33a13554f9d5fb856fe61758086  # release/v1
+        uses: pypa/gh-action-pypi-publish@7245906fb61fa33a13554f9d5fb856fe61758086 # release/v1
         with:
           repository-url: https://test.pypi.org/legacy/
-
 
   create-pr:
     needs:
@@ -106,7 +115,7 @@ jobs:
     runs-on: ubuntu-26.04
     steps:
       - name: Check out source tree
-        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262  # v4
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
         with:
           ref: release/${{ needs.bump-version.outputs.new_version }}
 
